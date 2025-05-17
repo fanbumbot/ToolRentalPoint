@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  {% include "base_head.html" %}
+  <title>{{ product.name }}</title>
+</head>
+<body class="body">
+
+{% include "base_body.html" %}
+{% include "navbar.html" %}
+
+<div class="container py-5">
+
+  <div class="row">
+      <div class="col-md-6">
+          <img src="../{{ product.image }}" class="img-fluid rounded shadow-sm" alt="{{ product.name }}">
+      </div>
+
+      <div class="col-md-6">
+          <h2 class="mb-5">{{ product.name }}</h2>
+
+          <p class="mb-1 text-muted">
+              {% if product.is_for_rent_or_sale %}
+                  <h3>Аренда:</h3>
+              {% else %}
+                  <h3>Покупка:</h3>
+              {% endif %}
+          </p>
+
+          <p class="fs-5 mt-3">
+            Изначальная стоимость: <span class="fw-bold text-dark">{{product.old_cost}}</span> ₽
+          </p>
+          {% if product.discount > 0 %}
+          <p class="fs-3 text-success fw-bold">
+              со скидкой: {{ product.new_cost }} ₽
+                  <span class="badge bg-success ms-2">-{{ (product.discount * 100) }}%</span>
+          </p>
+          {% endif %}
+
+          <form method="post" action="/cart/add" class="mt-4">
+              <input type="hidden" name="product_id" value="{{ product.id }}">
+
+              {% if product.is_for_rent_or_sale %}
+                <div class="mb-3">
+                    <label for="start_date" class="form-label">Начало аренды</label>
+                    <input type="date" class="form-control" id="start_date" name="start_date" min="{{ (now + timedelta(days=1)).strftime('%Y-%m-%d') }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="end_date" class="form-label">Конец аренды</label>
+                    <input type="date" class="form-control" id="end_date" name="end_date" min="{{ (now + timedelta(days=1)).strftime('%Y-%m-%d') }}" required>
+                </div>
+              {% endif %}
+
+              <div class="mb-3">
+                  <label for="quantity" class="form-label">Количество</label>
+                  <input type="number" class="form-control" id="quantity" name="quantity" min="1" value="1" required>
+              </div>
+
+              <p class="fs-5 mt-3">
+                Итоговая стоимость: <span id="total_cost" class="fw-bold text-dark">-</span> ₽
+              </p>
+
+              {% if product.is_for_rent_or_sale %}
+                <p id="rental_days_info" class="text-muted small" style="display: none;">
+                  Вы арендуете на <span id="rental_days_count">0</span> дней
+                </p>
+                <p class="text-muted small">
+                  Минимальный срок аренды: {{ product.standard_rental_period }} дней
+                </p>
+              {% endif %}
+              
+              <button type="submit" id="add_to_cart_btn" class="btn btn-outline-primary">
+                В корзину
+              </button>
+          </form>
+      </div>
+  </div>
+
+  <div>
+    <h3 class="mb-4">Описание</h3>
+    {{ product.description }}
+  </div>
+
+  <hr class="my-5">
+  <h3 class="mb-4">Отзывы</h3>
+
+  {% if navbar_info.user_id %}
+  <form method="post" action="/post_product_review/{{ product.slug }}?{{ request.query_params }}" class="mb-4">
+  <div class="mb-3">
+    <label for="score" class="form-label">Оценка (0-10)</label>
+    <input type="number" class="form-control" id="score" name="score" min="0" max="10" required>
+  </div>
+    <div class="mb-3">
+      <label for="comment" class="form-label">Оставьте отзыв</label>
+      <textarea class="form-control" id="comment" name="comment" rows="3" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Отправить</button>
+  </form>
+
+    {% if error %}
+        <div class="alert alert-danger" role="alert">
+          {{ error }}
+        </div>
+    {% endif %}
+  {% else %}
+  <p class="text-muted">Авторизуйтесь, чтобы оставить отзыв.</p>
+  {% endif %}
+
+  {% if reviews %}
+
+  <div class="mb-2">
+    Оценка продукта:
+    <span class="fw-bold">{{ total_score }} / 10</span>
+    <small class="text-muted">(отзывов: {{ total_reviews }})</small>
+  </div>
+
+  <ul class="list-group mb-4">
+    {% for review in reviews %}
+    <li class="list-group-item">
+      <div class="fw-bold">{{ review.user_name }}</div>
+      <div class="text-muted small">{{ review.publication_datetime.strftime('%d.%m.%Y %H:%M') }}</div>
+      <div class="mb-2">
+        Оценка:
+        {% for _ in range(review.score) %}★{% endfor %}{% for _ in range(10 - review.score) %}☆{% endfor %}
+      </div>
+      <p class="mb-0 mt-2">{{ review.comment }}</p>
+    </li>
+    {% endfor %}
+  </ul>
+
+  <nav>
+    <ul class="pagination justify-content-center">
+      {% for p in range(1, total_pages + 1) %}
+        <li class="page-item {% if p == page %}active{% endif %}">
+          <a class="page-link" href="?page={{ p }}">{{ p }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  </nav>
+
+  {% else %}
+    <p class="text-muted">Отзывов пока нет.</p>
+  {% endif %}
+
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const quantityInput = document.getElementById("quantity");
+    const startDateInput = document.getElementById("start_date");
+    const endDateInput = document.getElementById("end_date");
+    const totalCostDisplay = document.getElementById("total_cost");
+    const rentalDaysInfo = document.getElementById("rental_days_info");
+    const rentalDaysCount = document.getElementById("rental_days_count");
+    const addToCartBtn = document.getElementById("add_to_cart_btn");
+    const productId = {{ product.id }};
+    const isRental = {{ 'true' if product.is_for_rent_or_sale else 'false' }};
+    const standardRentalPeriod = {{ product.standard_rental_period if product.is_for_rent_or_sale else 'null' }};
+    const itemsInStock = {{ product.items_in_stock }};
+
+    function disableAddToCart(disable) {
+      addToCartBtn.disabled = disable;
+    }
+
+    function updateRentalDays(start, end) {
+      const startDate = new Date(start);
+      const endDate = new Date(end);
+
+      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime()) || endDate < startDate) {
+        rentalDaysInfo.style.display = "none";
+        disableAddToCart(true);
+        return false;
+      }
+
+      const diffMs = endDate - startDate;
+      const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24)) + 1;
+
+      rentalDaysCount.textContent = diffDays;
+      rentalDaysInfo.style.display = "block";
+      disableAddToCart(false);
+
+      return true;
+    }
+
+    async function recalculateTotal() {
+      let quantity = parseInt(quantityInput.value) || 1;
+
+      if (quantity < 1) {
+        quantity = 1;
+        quantityInput.value = 1;
+      }
+
+      if (!isRental) {
+        try {
+          const response = await fetch("/api/get_cost_for_sale", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              product_id: productId,
+              quantity: quantity
+            })
+          });
+
+          if (!response.ok) {
+            const error = await response.json();
+            totalCostDisplay.textContent = error.detail || "Ошибка";
+            disableAddToCart(true);
+            return;
+          }
+
+          const data = await response.json();
+          totalCostDisplay.textContent = data.total_cost.toLocaleString("ru-RU");
+          disableAddToCart(false);
+
+        } catch (error) {
+          console.error(error);
+          totalCostDisplay.textContent = "Ошибка связи";
+          disableAddToCart(true);
+        }
+        return;
+      }
+
+      const startDate = startDateInput?.value;
+      const endDate = endDateInput?.value;
+
+      if (!startDate || !endDate) {
+        totalCostDisplay.textContent = "-";
+        rentalDaysInfo.style.display = "none";
+        disableAddToCart(true);
+        return;
+      }
+
+      if (!updateRentalDays(startDate, endDate)) {
+        totalCostDisplay.textContent = "Ошибка в датах";
+        return;
+      }
+
+      try {
+        const response = await fetch("/api/get_cost_for_rent", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            product_id: productId,
+            quantity: quantity,
+            start_date: startDate,
+            end_date: endDate
+          })
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          totalCostDisplay.textContent = error.detail || "Ошибка";
+          disableAddToCart(true);
+          return;
+        }
+
+        const data = await response.json();
+        totalCostDisplay.textContent = data.total_cost.toLocaleString("ru-RU");
+        disableAddToCart(false);
+
+      } catch (error) {
+        console.error(error);
+        totalCostDisplay.textContent = "Не удалось посчитать стоимость";
+        disableAddToCart(true);
+      }
+    }
+
+    quantityInput.addEventListener("input", recalculateTotal);
+    startDateInput?.addEventListener("input", recalculateTotal);
+    endDateInput?.addEventListener("input", recalculateTotal);
+
+    recalculateTotal();
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  {% include "base_head.html" %}
+  <title>Пополнение кошелька</title>
+</head>
+<body class="body">
+
+{% include "base_body.html" %}
+{% include "navbar.html" %}
+
+<div class="container py-5" style="max-width: 500px;">
+  <h1 class="mb-4 text-center">Пополнение кошелька</h1>
+
+  {% if error_message %}
+    <div class="alert alert-danger">{{ error_message }}</div>
+  {% endif %}
+  {% if success_message %}
+    <div class="alert alert-success">{{ success_message }}</div>
+  {% endif %}
+
+  <form method="post" action="/wallet/top_up">
+    <div class="mb-3">
+      <label for="amount" class="form-label">Сумма пополнения (₽):</label>
+      <input type="number" class="form-control" id="amount" name="amount" min="1" step="1" required>
+    </div>
+
+    <div class="d-grid gap-2">
+      <button type="submit" class="btn btn-primary btn-lg">Далее</button>
+    </div>
+  </form>
+</div>
+
+</body>
+</html>

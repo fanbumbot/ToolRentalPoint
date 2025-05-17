@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  {% include "base_head.html" %}
+  <title>Товары</title>
+</head>
+<body class="body">
+
+{% include "base_body.html" %}
+{% include "navbar.html" %}
+
+<div class="container py-5">
+
+    <h1 class="mb-4 display-5 fw-semibold border-bottom pb-2">Каталог товаров</h1>
+
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <strong>Фильтры</strong>
+        </div>
+        <div class="card-body">
+            <form method="get">
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <label for="min_cost" class="form-label">Мин. цена</label>
+                        <input type="number" class="form-control" id="min_cost" name="min_cost" value="{{ min_cost or '' }}" min="0" max="1000000" placeholder="Без ограничений">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="max_cost" class="form-label">Макс. цена</label>
+                        <input type="number" class="form-control" id="max_cost" name="max_cost" value="{{ max_cost or '' }}" min="0" max="1000000" placeholder="Без ограничений">
+                    </div>
+                </div>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <label for="order_by">Сортировка</label>
+                        <select name="order_by" id="order_by" class="form-select">
+                            <option value="name" {% if order_by == "name" %}selected{% endif %}>По имени</option>
+                            <option value="cost" {% if order_by == "cost" %}selected{% endif %}>По цене</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="order">Порядок сортировки</label>
+                        <select name="order" id="order" class="form-select">
+                            <option value="asc" {% if order == "asc" %}selected{% endif %}>По возрастанию</option>
+                            <option value="desc" {% if order == "desc" %}selected{% endif %}>По убыванию</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="category">Категория</label>
+                        <select name="category" id="category" class="form-select">
+                            <option value="">Все</option>
+                            {% for category_name, category_id in all_categories.items() %}
+                                <option value="{{ category_id }}" {% if selected_category_id == category_id %}selected{% endif %}>{{ category_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <label for="substring_find" class="form-label">Название</label>
+                        <input type="text" class="form-control" id="substring_find" name="substring_find" value="{{ substring_find or '' }}" placeholder="Все товары">
+                    </div>
+                </div>
+                <a href="/products_export?{{ request.query_params }}" class="btn btn-outline-success mb-3">
+                    Экспорт в Excel
+                </a>
+                <div class="mt-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">Применить</button>
+                    <a type="button" class="btn btn-outline-primary" href="/products">Сбросить</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if products %}
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for product in products %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 d-flex flex-row shadow-sm">
+                    <div class="card-body d-flex flex-column justify-content-between flex-grow-1">
+                        <div>
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            {% if product.discount > 0 %}
+                                <p class="card-text mb-1">Исходная цена: <s>{{ product.old_cost }} ₽</s></p>
+                                <p class="card-text text-success fw-bold mb-1">Цена со скидкой: {{ product.new_cost }} ₽</p>
+                            {% else %}
+                                <p class="card-text mb-2">Цена: {{ product.old_cost }} ₽</p>
+                            {% endif %}
+                            <p class="card-text mb-2">В наличии: {{ product.items_in_stock }} шт.</p>
+                        </div>
+            
+                        <div class="mt-2 mb-2">
+                            <a href="/products/{{ product.slug }}" class="btn btn-outline-primary btn-sm">Подробнее</a>
+                        </div>
+                        <div class="d-flex flex-wrap gap-2 mb-2">
+                            {% if product.discount > 0 %}
+                                <span class="badge bg-success">Скидка -{{ (product.discount * 100)|round(0, 'floor') }} %</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Без скидки</span>
+                            {% endif %}
+                            <span class="badge bg-info text-dark">{{ product.category }}</span>
+                            {% if product.items_in_stock == 0 %}
+                                <span class="badge bg-danger">Нет на складе</span>
+                            {% endif %}
+                        </div>
+                    </div>
+            
+                    <img src="{{ product.image }}"
+                         alt="{{ product.name }}"
+                         class="img-fluid rounded-end m-2 p-2 product-img"
+                         style="width: 130px; object-fit: cover;"
+                         loading="lazy"
+                    >
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+    <div class="alert alert-warning text-center">
+        Нет товаров по заданным параметрам.
+    </div>
+    {% endif %}
+
+    <nav class="mt-4">
+        <ul class="pagination pagination-md justify-content-center">
+            {% for p in range(1, total_pages + 1) %}
+                <li class="page-item {% if p == page %}active{% endif %}">
+                    <a class="page-link"
+                       href="?page={{ p }}{% if min_cost is not none %}&min_cost={{ min_cost }}{% endif %}{% if max_cost is not none %}&max_cost={{ max_cost }}{% endif %}&page_size={{ page_size }}&order_by={{ order_by }}&order={{ order }}&category={{ selected_category_id }}">
+                        {{ p }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </nav>
+
+</div>

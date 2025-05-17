@@ -1,0 +1,61 @@
+<nav class="nav justify-content-end p-1 gap-2">
+  {% if navbar_info != None %}
+  {% if navbar_info.role == "Admin" %}
+    <div class="dropdown">
+      <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuAdmin" data-bs-toggle="dropdown" aria-expanded="false">
+        Меню администратора
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenuAdmin">
+          <li><a class="dropdown-item" href="/admin_products">Товары на витрине</a></li>
+          <li><a class="dropdown-item" href="/admin_categories">Категории товаров</a></li>
+          <li><a class="dropdown-item" href="/discounts">Скидки</a></li>
+          <li><a class="dropdown-item" href="/discount_seasons">Сезоны скидок</a></li>
+      </ul>
+    </div>
+  {% endif %}
+  {% if navbar_info.role == "Admin" or navbar_info.role == "Employee" %}
+    <div class="dropdown">
+      <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuEmpoyee" data-bs-toggle="dropdown" aria-expanded="false">
+        Меню сотрудника
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenuEmpoyee">
+          <li><a class="dropdown-item" href="/all_orders">Все заказы</a></li>
+          <li><a class="dropdown-item" href="/items">Товары на складе</a></li>
+      </ul>
+    </div>
+  {% endif %}
+  <a class="btn text-bottom" href="/wallet">
+    Баланс: {{navbar_info.money}}
+  </a>
+  {% endif %}
+  <a href="/">
+    <button class="btn text-bottom">На главную</button>
+  </a>
+  <div class="dropdown">
+    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+       Личный кабинет
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+
+      {% if navbar_info == None %}
+        <li><a class="dropdown-item" href="/authorization">Авторизация</a></li>
+        <li><a class="dropdown-item" href="/registration">Регистрация</a></li>
+      {% else %}
+        <li><a class="dropdown-item" href="/cart">Корзина</a></li>
+        <li><a class="dropdown-item" href="/orders">Заказы</a></li>
+        <li><a class="dropdown-item" href="" onclick="send_logout()">Выйти</a></li>
+      {% endif %}
+    </ul>
+  </div>
+</nav>
+
+<script>
+  async function send_logout(){
+      await fetch("/logout", {
+              method: "POST",
+              headers: { "Accept": "application/json", "Content-Type": "application/json" },
+              body: JSON.stringify({})
+          });
+      window.location.href = "/"
+  }
+</script>

@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    {% include "base_head.html" %}
+    <title>Главная страница</title>
+</head>
+<body class="body">
+
+{% include "base_body.html" %}
+{% include "navbar.html" %}
+
+<div class="container py-5" style="max-width: 500px;">
+    <h3 class="mb-5">
+        Добро пожаловать!
+    </h3>
+    <h6 class="mb-3">
+        Данное приложение даст Вам возможность просмотреть ассортимент инструментов, а также заказать и оплатить покупку прямо на сайте.
+    </h6>
+    <h6 class="mb-5">
+        Получение заказа происходит в пункте проката инструмента.
+    </h6>
+    <div class="card-body">
+        <a type="button" class="btn btn-outline-dark btn-lg" href="/products">Товары</a>
+    </div>
+</div>
+
+</body>
+</html>

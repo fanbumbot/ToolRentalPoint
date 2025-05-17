@@ -1,0 +1,4 @@
+TOKEN_SECRET_CODE = "C(@)Mcu29nyc98YCN9Y(cyY3C9YCW)"
+TOKEN_ALGORITHM = "HS256"
+
+TOKEN_NAME = "user_access_token"

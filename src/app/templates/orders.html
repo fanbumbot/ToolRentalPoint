@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  {% include "base_head.html" %}
+  <title> Заказы </title>
+</head>
+<body class="body">
+
+{% include "base_body.html" %}
+{% include "navbar.html" %}
+
+<h1>Мои заказы</h1>
+
+{% if orders %}
+  <ul class="order-list">
+    {% for order in orders %}
+      <li class="order-item mb-5">
+        <h3>Заказ №{{ order.id }} - 
+                  {% if order.status == "AwaitingPayment" %}
+          Готов к оплате
+        {% elif order.status == "HasBeenPaid" %}
+          Оплачен
+        {% elif order.status == "HasBeenReceived" %}
+          Получен
+        {% elif order.status == "DeniedByEmployee" %}
+          Отменён сотрудником
+        {% elif order.status == "DeniedByCustomer" %}
+          Отменён заказчиком
+        {% elif order.status == "DeniedBySystem"%}
+          Отменён системой (просрочена оплата)
+        {% endif %}
+        </h3>
+        <p>Сумма: {{ order.total_cost }} ₽</p>
+        <a href="/orders/{{ order.id }}" class="btn btn-primary">Подробнее</a>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>У вас нет заказов.</p>
+{% endif %}

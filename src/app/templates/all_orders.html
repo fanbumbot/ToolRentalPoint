@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  {% include "base_head.html" %}
+  <title>Поиск заказов</title>
+</head>
+<body class="body">
+
+{% include "base_body.html" %}
+{% include "navbar.html" %}
+
+<div class="container py-5">
+  <h1 class="mb-4 display-5 fw-semibold border-bottom pb-2">Поиск заказов</h1>
+
+  <form method="get" class="mb-4">
+    <div class="row g-3 align-items-end">
+      <div class="col-md-4">
+        <label for="order_pattern" class="form-label">ID заказа</label>
+        <input type="text" name="order_pattern" id="order_pattern" value="{{ order_pattern }}" class="form-control" placeholder="Введите ID">
+      </div>
+      <div class="col-md-2">
+        <button type="submit" class="btn btn-primary">Найти</button>
+      </div>
+    </div>
+  </form>
+
+  {% if orders %}
+    <table class="table table-hover">
+      <thead class="table-light">
+        <tr>
+          <th>ID заказа</th>
+          <th>Действия</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order_id in orders %}
+        <tr>
+          <td>{{ order_id }}</td>
+          <td>
+            <a href="/order_employee/{{ order_id }}" class="btn btn-outline-primary btn-sm">Подробнее</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <nav class="mt-4">
+      <ul class="pagination pagination-md justify-content-center">
+        {% for p in range(1, total_pages + 1) %}
+          <li class="page-item {% if p == page %}active{% endif %}">
+            <a class="page-link"
+               href="?order_pattern={{ order_pattern }}&page={{ p }}&page_size={{ page_size }}">
+              {{ p }}
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    </nav>
+  {% else %}
+    <div class="alert alert-warning text-center">Заказы не найдены.</div>
+  {% endif %}
+</div>
+
+</body>
+</html>

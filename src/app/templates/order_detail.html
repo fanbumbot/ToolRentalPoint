@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  {% include "base_head.html" %}
+  <title>Заказ №{{ order.id }}</title>
+</head>
+<body class="body">
+
+{% include "base_body.html" %}
+{% include "navbar.html" %}
+
+<div class="container py-5">
+  <h1 class="mb-4">Заказ №{{ order.id }}</h1>
+
+  <div class="row row-cols-1 g-4 mb-4">
+    {% for item in order.items %}
+    <div class="col">
+        <div class="card h-100 shadow-sm d-flex flex-row align-items-center p-2">
+          <img src="../{{ item.image }}" alt="{{ item.name }}" class="img-fluid rounded m-2" style="width: 120px; object-fit: cover;">
+          <div class="card-body d-flex flex-column justify-content-between">
+            <h5 class="card-title">{{ item.name }}</h5>
+
+            {% if item.discount > 0 %}
+              <p class="mb-1">Цена: <s>{{ item.initial_cost }} ₽</s> <span class="text-success fw-bold">{{ item.cost_with_discount }} ₽</span></p>
+            {% else %}
+              <p class="mb-1">Цена: {{ item.initial_cost }} ₽</p>
+            {% endif %}
+
+            <p class="mb-1">Количество: {{ item.quantity }}</p>
+
+            {% if item.is_for_rent_or_sale %}
+              <p class="mb-1">Аренда: с {{ item.start_rental_period }} по {{ item.end_rental_period }}</p>
+            {% endif %}
+
+            <p class="mb-1">Общая стоимость: {{ item.total_cost }}</p>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+
+    <div class="mb-3">
+        <h4>Статус заказа:</h4>
+        {% if order.status == "AwaitingPayment" %}
+          Готов к оплате
+        {% elif order.status == "HasBeenPaid" %}
+          Оплачен
+        {% elif order.status == "HasBeenReceived" %}
+          Получен
+        {% elif order.status == "DeniedByEmployee" %}
+          Отменён сотрудником
+        {% elif order.status == "DeniedByCustomer" %}
+          Отменён заказчиком
+        {% elif order.status == "DeniedBySystem"%}
+          Отменён системой (просрочена оплата)
+        {% endif %}
+      </div>
+    
+      <div class="mb-4">
+        <h4>Общая стоимость:</h4> {{ order.total_cost }} ₽
+      </div>
+    
+  </div>
+
+  {% if error_message %}
+    <div class="alert alert-danger">{{ error_message }}</div>
+  {% endif %}
+
+  <div id="payment-error-container" class="mb-3"></div>
+
+  <div class="text-center">
+    {% if order.status == "AwaitingPayment" %}
+    <div class="mb-3">
+      У вас есть 15 минут с начала регистрации заказа для оплаты (осталось {{ order.time_left_for_payment }} мин.)
+    </div>
+    <button id="pay-btn" class="btn btn-success btn-lg me-2">Оплатить</button>
+    {% endif %}
+
+    {% if order.status == "AwaitingPayment" or order.status == "HasBeenPaid" %}
+    <form method="post" action="/orders/{{ order.id }}/cancel" class="d-inline">
+      <button type="submit" class="btn btn-outline-danger btn-lg">Отменить</button>
+    </form>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const payBtn = document.getElementById("pay-btn");
+    const errorContainer = document.getElementById("payment-error-container");
+
+    if (payBtn) {
+      payBtn.addEventListener("click", function () {
+        fetch(window.location.pathname + "/pay", {
+          method: "POST",
+          headers: {
+            "X-Requested-With": "XMLHttpRequest"
+          }
+        }).then(response => {
+          if (response.status === 200) {
+            window.location.reload();
+          } else {
+            return response.json().then(data => {
+              errorContainer.innerHTML = `<div class="alert alert-danger">
+                    ${data.detail}
+                </div>`;
+            });
+          }
+        }).catch(() => {
+          errorContainer.innerHTML = `<div class="alert alert-danger">
+                Произошла ошибка при оплате
+            </div>`;
+        });
+      });
+    }
+  });
+</script>
+
+</body>
+</html>

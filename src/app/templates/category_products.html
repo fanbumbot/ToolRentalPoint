@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  {% include "base_head.html" %}
+  <title>Продукты</title>
+</head>
+<body class="body">
+
+{% include "base_body.html" %}
+{% include "navbar.html" %}
+
+<div class="d-grid gap-4 d-md-flex justify-content-md-center">
+  <h1>{{category.name}}</h1>
+  {% include "add_new_button.html" %}
+</div>
+<div class="d-grid gap-4 d-md-flex justify-content-md-center">{{category.description}}</div>
+<div class="mb-5"></div>
+
+<div class="d-md-flex justify-content-md-center">
+{% if products_size != 0 %}
+<div class="container gap-2 w-50">
+  {% for i in range(products_size) %}
+    {% if i % 2 == 0 %}
+    <div class="row">
+    {% endif %}
+  <div class="col">
+  <div class="card mb-2">
+    <div class="card-body">
+      <h5 class="card-title">{{products[i].name}}</h5>
+      <p class="card-text">
+        <div>
+          {% if products[i].new_cost != products[i].old_cost %}
+            Текущая стоимость: <s>{{products[i].old_cost}} руб.</s> {{products[i].new_cost}} руб.
+            <div>(Скидка: {{products[i].discount}}%)</div>
+          {% else %}
+            Текущая стоимость: {{products[i].new_cost}} руб.
+          {% endif %}
+        </div>
+        <div>
+          {{products[i].description}}
+        </div>
+      </p>
+      <a class="btn btn-primary" href="{{url_for('get_product_html', product_slug=products[i].slug)}}">Смотреть</a>
+   </div>
+  </div>
+  </div>
+    {% if i % 2 == 1 or i == products_size %}
+    </div>
+    {% endif %}
+  {% endfor %}
+
+  {% for i in range(2-(products_size % 2)) %}
+  <div class="col"></div>
+  {% endfor %}
+  {% if products_size % 2 != 0 %}
+  </div>
+  {% endif %}
+</div>
+{% else %}
+Нет товара в данной категории
+{% endif %}
+</div>
+
+</body>
+</html>

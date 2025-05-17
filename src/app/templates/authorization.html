@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    {% include "base_head.html" %}
+    <title>Авторизация</title>
+</head>
+<body class="body">
+
+{% include "base_body.html" %}
+
+<div>
+    <div class="position-absolute top-50 start-50 translate-middle w-25">
+        <label class="form-label display-3">Авторизация</label>
+        <div class="mb-5"></div>
+        <div>
+            <label id="error_message" class="form-label" style="color: red;"></label>
+        </div>
+        <div class="d-grid gap-3">
+            <input id="login" type="text" class="form-control" placeholder="Логин">
+            <input id="password" type="password" class="form-control" placeholder="Пароль">
+        </div>
+        <div class="mb-3"></div>
+        <button type="button" class="btn btn-primary btn-md" onclick="send()">Авторизоваться</button>
+        <div class="mb-4"></div>
+        <a class="small" href="registration">Не зарегистрированы?</a>
+        <a class="small float-end" href="/">На главную</a>
+    </div>
+</div>
+
+<script>
+    async function send(){
+        const login = document.getElementById("login").value;
+        const password = document.getElementById("password").value;
+ 
+        const response = await fetch("/authorization", {
+                method: "POST",
+                headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    login: login,
+                    password: password
+                })
+            });
+        if (response.ok)
+        {
+            const data = await response.json();
+
+            if (data.error_message != "")
+            {
+                document.getElementById("error_message").textContent = data.error_message;
+            }
+            else
+            {
+                window.location.href = "/"
+            }
+        }
+    }
+</script>
+
+</body>
+</html>
