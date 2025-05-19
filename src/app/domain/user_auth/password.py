@@ -8,7 +8,7 @@ from ..validation import type_validate
 class PasswordDoesNotMeetRequirementsError(Exception):
     pass
 
-regex = "^[a-z0-9_]{3,16}$"
+regex = "^[a-zA-Z0-9_]{3,16}$"
 
 @runtime_checkable
 class Crypto(Protocol):

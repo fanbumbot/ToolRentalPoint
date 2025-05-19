@@ -216,56 +216,57 @@
 
         } catch (error) {
           console.error(error);
-          totalCostDisplay.textContent = "Ошибка связи";
+          totalCostDisplay.textContent = "Ошибка";
           disableAddToCart(true);
         }
-        return;
       }
+      else
+      {
+        const startDate = startDateInput?.value;
+        const endDate = endDateInput?.value;
 
-      const startDate = startDateInput?.value;
-      const endDate = endDateInput?.value;
-
-      if (!startDate || !endDate) {
-        totalCostDisplay.textContent = "-";
-        rentalDaysInfo.style.display = "none";
-        disableAddToCart(true);
-        return;
-      }
-
-      if (!updateRentalDays(startDate, endDate)) {
-        totalCostDisplay.textContent = "Ошибка в датах";
-        return;
-      }
-
-      try {
-        const response = await fetch("/api/get_cost_for_rent", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            product_id: productId,
-            quantity: quantity,
-            start_date: startDate,
-            end_date: endDate
-          })
-        });
-
-        if (!response.ok) {
-          const error = await response.json();
-          totalCostDisplay.textContent = error.detail || "Ошибка";
+        if (!startDate || !endDate) {
+          totalCostDisplay.textContent = "-";
+          rentalDaysInfo.style.display = "none";
           disableAddToCart(true);
           return;
         }
 
-        const data = await response.json();
-        totalCostDisplay.textContent = data.total_cost.toLocaleString("ru-RU");
-        disableAddToCart(false);
+        if (!updateRentalDays(startDate, endDate)) {
+          totalCostDisplay.textContent = "Ошибка в датах";
+          return;
+        }
 
-      } catch (error) {
-        console.error(error);
-        totalCostDisplay.textContent = "Не удалось посчитать стоимость";
-        disableAddToCart(true);
+        try {
+          const response = await fetch("/api/get_cost_for_rent", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              product_id: productId,
+              quantity: quantity,
+              start_date: startDate,
+              end_date: endDate
+            })
+          });
+
+          if (!response.ok) {
+            const error = await response.json();
+            totalCostDisplay.textContent = error.detail || "Ошибка";
+            disableAddToCart(true);
+            return;
+          }
+
+          const data = await response.json();
+          totalCostDisplay.textContent = data.total_cost.toLocaleString("ru-RU");
+          disableAddToCart(false);
+
+        } catch (error) {
+          console.error(error);
+          totalCostDisplay.textContent = "Не удалось посчитать стоимость";
+          disableAddToCart(true);
+        }
       }
     }
 

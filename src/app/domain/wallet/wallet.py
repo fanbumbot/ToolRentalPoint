@@ -49,12 +49,4 @@ class Wallet(Entity):
         self._money = Money(self._money.amount - spent_money.amount)
         self.impl.call(UpdateWalletMoneyCommand, self.id, self._money)
         return self._money
-
-    def give_money(self, wallet: "Wallet", money: Money):
-        type_validate(wallet, "Wallet", Wallet)
-
-        self.spend_money(money)
-        wallet.gain_money(money)
-
-        return money
         

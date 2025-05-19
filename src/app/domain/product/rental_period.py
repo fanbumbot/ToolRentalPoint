@@ -18,7 +18,7 @@ class RentalPeriodDuration:
     def __post_init__(self):
         type_validate(self.duration, "Duration", timedelta)
 
-        if self.duration < timedelta.min:
+        if self.duration < timedelta():
             raise NegativeDurationError
 
 @dataclass(frozen=True)

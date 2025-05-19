@@ -46,6 +46,7 @@ class Discount(Entity):
         discount_value: DiscountValue,
         discount_season: DiscountSeason
     ):
+        type_validate(product, "Product", Product)
         type_validate(discount_value, "Discount value", DiscountValue)
         type_validate(discount_season, "Discount season", DiscountSeason)
 

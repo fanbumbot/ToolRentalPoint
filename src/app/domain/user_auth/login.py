@@ -6,7 +6,7 @@ from ..validation import type_validate
 class LoginDoesNotMeetRequirementsError(Exception):
     pass
 
-regex = "^[a-z0-9_]{3,16}$"
+regex = "^[a-zA-Z0-9_]{3,16}$"
 
 @dataclass(frozen=True)
 class Login:
