@@ -70,9 +70,10 @@ def convert_is_for_rent(key: str, is_for_rent_str: str, session: Session):
     return is_for_rent_str
 
 def update_image(name: str, image: UploadFile):
-    file_path = f"/static/images/{name}"
+    output_file_path = f"static/images/{name}"
+    file_path = "app/" + output_file_path
     if image.size == 0:
-        return file_path
+        return output_file_path
 
     if os.path.exists(file_path):
         os.remove(file_path)
@@ -80,7 +81,7 @@ def update_image(name: str, image: UploadFile):
     with open(file_path, "wb") as buffer:
         buffer.write(image.file.read())
 
-    return file_path
+    return output_file_path
 
 @dataclass(frozen=True)
 class ProductCreateDTO(CreateDTO):
@@ -106,7 +107,7 @@ class ProductCreateDTO(CreateDTO):
         if check_model != None:
             raise FieldValidationError("Товар с таким слагом уже существует")
 
-        file_path = update_image(model.name, model.image)
+        file_path = update_image(model.slug, model.image)
         model.image = file_path
 
         session.add(model)
@@ -196,7 +197,7 @@ class ProductEditDTO(EditDTO):
             
             raise FieldValidationError("Если товар для аренды - необходимо указывать срок аренды\nЕсли для покупки - нельзя указывать срок аренды")
 
-        file_path = update_image(model.name, data["image"])
+        file_path = update_image(model.slug, data["image"])
 
         setattr(model, "is_for_rent_or_sale", False)
         setattr(model, "is_active", False)

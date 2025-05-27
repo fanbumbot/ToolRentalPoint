@@ -1,5 +1,132 @@
+:root {
+  --accent-color: #3f51b5;
+  --accent-light: #e4e6f7;
+  --danger-color: #e53935;
+  --success-color: #43a047;
+  --bg-light: #f4f4f4;
+  --text-color: #333;
+  --border-radius: 0.6rem;
+  --card-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.05);
+}
 
-.body
-{
-    margin: 1%;
+body {
+  background-color: var(--bg-light);
+  color: var(--text-color);
+  font-family: 'DejaVu Sans Mono', monospace;
+  font-size: 16px;
+  line-height: 1.6;
+  margin: 1%;
+}
+
+h1, h2, h3, h4 {
+  color: var(--accent-color);
+  font-weight: 600;
+}
+
+.container {
+  max-width: 1140px;
+}
+
+.card {
+  border: none;
+  border-radius: var(--border-radius);
+  box-shadow: var(--card-shadow);
+  background-color: rgb(255, 255, 255);
+}
+
+.card-header {
+  color: white;
+  background-color: var(--accent-color);
+}
+
+.card-body {
+  padding: 2rem;
+}
+
+.table {
+  background-color: white;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+}
+
+.table th {
+  background-color: var(--accent-color);
+  color: white;
+  font-weight: 600;
+  font-size:large;
+  padding-block-start: 1.4%;
+}
+
+.table td, .table th {
+  vertical-align: middle;
+}
+
+input.form-control,
+select.form-select,
+textarea.form-control {
+  border-radius: var(--border-radius);
+  border: 1px solid #ddd;
+  transition: border-color 0.3s ease-in-out, box-shadow 0.3s;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 0.2rem rgba(63, 81, 181, 0.25);
+}
+
+.btn {
+  border-radius: var(--border-radius);
+  padding: 0.5rem 1.25rem;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-primary {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+}
+
+.btn-primary:hover {
+  background-color: #303f9f;
+  border-color: #303f9f;
+}
+
+.btn-outline-primary {
+  color: var(--accent-color);
+  border-color: var(--accent-color);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--accent-light);
+  color: var(--accent-color);
+}
+
+.btn-success {
+  background-color: var(--success-color);
+  border-color: var(--success-color);
+}
+
+.btn-success:hover {
+  background-color: #388e3c;
+}
+
+.btn-danger {
+  background-color: var(--danger-color);
+  border-color: var(--danger-color);
+}
+
+.btn-danger:hover {
+  background-color: #c62828;
+}
+
+.badge {
+  font-size: 0.85rem;
+  padding: 0.4em 0.6em;
+  border-radius: 0.5rem;
+}
+
+.alert {
+  border-radius: var(--border-radius);
 }
