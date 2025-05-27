@@ -210,6 +210,15 @@ def post_product_review(
             
             service.post_review(user_id, model.id, comment, score)
             session.commit()
+
+            return get_product_info(
+                request,
+                slug,
+                page,
+                page_size,
+                session
+            )
+        
         except (TooManySymbolsInReviewError, WrongScoreInReviewError, ReviewAlreadyExistsError) as e:
             if isinstance(e, TooManySymbolsInReviewError):
                 error = f"Максимальная длина отзыва: {MAX_POST_LEN} символов"

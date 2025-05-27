@@ -46,7 +46,7 @@ class CartService:
             discount = self.product_service.get_discount(product_id)
 
             if product_model.is_for_rent_or_sale:
-                duration = product_in_cart_model.end_rent-product_in_cart_model.start_rent
+                duration = product_in_cart_model.end_rent-product_in_cart_model.start_rent+timedelta(days=1)
                 standard_duration = timedelta(days=product_model.standard_rental_period)
 
                 cost_with_discount = self.product_service.get_cost_for_rent(

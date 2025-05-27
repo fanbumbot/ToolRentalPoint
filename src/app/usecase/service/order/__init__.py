@@ -168,8 +168,8 @@ class OrderService:
                 )
                 items.append(order_item_model)
 
-        now = datetime.now(timezone.utc)
-        time_left_for_payment = TIME_TO_PAY_ORDER_IN_MINUTES - (now-order_model.registration_datetime.replace(tzinfo=timezone.utc)).seconds//60
+        now = datetime.now()
+        time_left_for_payment = TIME_TO_PAY_ORDER_IN_MINUTES - (now-order_model.registration_datetime).seconds//60
 
         view = OrderView(
             order_model.id,

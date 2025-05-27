@@ -53,7 +53,8 @@ class ItemService(BaseCRUDService):
             self.item_impl,
             not product_model.is_for_rent_or_sale,
             product_model.is_for_rent_or_sale,
-            ItemStatus[item_model.status]
+            ItemStatus[item_model.status],
+            None
         )
 
         return item
