@@ -31,5 +31,5 @@ class UserCreateAuthSagaStep(SagaStep):
             self.crypto
         )
 
-        self.user_model.password = user.hashed_password
+        self.user_model.password = user.hashed_password.hashed_password
         return user
