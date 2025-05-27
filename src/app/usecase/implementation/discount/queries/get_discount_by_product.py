@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from sqlalchemy.orm import Session
 
 from .....domain.entity import EntityCQImpl
@@ -45,7 +47,7 @@ class GetDiscountByProductQueryImpl(GetDiscountByProductQuery):
             return None
         
         if product_model.standard_rental_period:
-            duration = RentalPeriodDuration(product_model.standard_rental_period)
+            duration = RentalPeriodDuration(timedelta(days=product_model.standard_rental_period))
         else:
             duration = None
         

@@ -40,7 +40,6 @@ class ItemCreateDTO(CreateDTO):
     def get_model_by_data(cls, session: Session, data: dict[str, object]):
         args = cls._get_values_for_model_by_data(session, data)
         args["status"] = ItemStatus.OnStock.name
-        args["owner_id"] = None
         args["is_in_stock"] = False
         args["is_ready"] = False
         args["order_id"] = None

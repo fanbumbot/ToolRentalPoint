@@ -27,7 +27,6 @@ class ItemService(BaseCRUDService):
             sticked_id = sticked_id,
             product_id = product_id,
             status = ItemStatus.Unknown,
-            owner_id = None,
             is_in_stock = False,
             is_ready = False,
             order_id = None
