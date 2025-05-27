@@ -76,10 +76,12 @@
       </div>
   </div>
 
+  {% autoescape false %}
   <div>
     <h3 class="mb-4">Описание</h3>
-    {{ product.description }}
+    {{ product.description.replace('\n', '<br>') }}
   </div>
+  {% endautoescape %}
 
   <hr class="my-5">
   <h3 class="mb-4">Отзывы</h3>

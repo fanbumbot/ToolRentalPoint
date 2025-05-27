@@ -2,3 +2,5 @@
 /.vscode
 /src/app/static/images
 __pycache__
+*.dot
+*.png

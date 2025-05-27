@@ -37,6 +37,9 @@ class FieldCheckbox(FieldInput):
 class FieldFile(FieldInput):
     is_file: bool = True
 
+class FieldTextArea(FieldInput):
+    textarea: bool = True
+
 class Fields:
     def __init__(self, fields: list[FieldView]):
         fields_dict: dict[str, FieldView] = dict()

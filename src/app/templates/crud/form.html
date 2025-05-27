@@ -54,6 +54,13 @@
                 name="{{ field.id }}"
                 {% if field.required %}required{% endif %}
               >
+            {% elif field.textarea %}
+              <textarea
+                name="{{ field.id }}"
+                class="form-control {% if errors and field.id in errors %}is-invalid{% endif %}"
+                placeholder="{{ field.placeholder or '' }}"
+                {% if field.required %}required{% endif %}
+              >{{ item.get_value(field.id) if item else '' }}
             {% else %}
               <input
                 name="{{ field.id }}"
